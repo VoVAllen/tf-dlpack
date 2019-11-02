@@ -129,8 +129,8 @@ public:
 };
 
 #define REGISTER_KERNEL_DISPATCH(T) \
-    REGISTER_KERNEL_BUILDER(Name("ToDLPack").Device(DEVICE_CPU).TypeConstraint<T>("T"), ToDLPackOP<CPUDevice, T>); \
-    REGISTER_KERNEL_BUILDER(Name("ToDLPack").Device(DEVICE_GPU).TypeConstraint<T>("T"), ToDLPackOP<GPUDevice, T>);
+    REGISTER_KERNEL_BUILDER(Name("ToDlpack").Device(DEVICE_CPU).TypeConstraint<T>("T"), ToDLPackOP<CPUDevice, T>); \
+    REGISTER_KERNEL_BUILDER(Name("ToDlpack").Device(DEVICE_GPU).TypeConstraint<T>("T"), ToDLPackOP<GPUDevice, T>);
 
 REGISTER_KERNEL_DISPATCH(float);
 REGISTER_KERNEL_DISPATCH(double);
