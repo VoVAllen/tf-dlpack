@@ -32,7 +32,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g3 -ggdb -D_GLIBCXX_USE
 
 include_directories(include)
 include_directories(/usr/local/cuda/include/)
-add_library(tfdlpack SHARED src/to_dlpack_op.cc src/to_dlpack_kernel.cc)
+add_library(tfdlpack SHARED src/dlpack_op.cc src/to_dlpack_kernel.cc src/from_dlpack_kernel.cc)
 target_link_libraries(tfdlpack ${TF_LFLAGS})
 
 
