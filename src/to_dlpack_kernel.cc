@@ -38,6 +38,7 @@ public:
     }
 };
 
+// TODO: Runtime check instead of using template  
 template <typename DATA_TYPE>
 class DataTypeTrait;
 
@@ -98,7 +99,7 @@ public:
         tfDLMTensor->tensor.dl_tensor.ctx = ctx;
         int ndim = input_tensor.dims();
         tfDLMTensor->tensor.dl_tensor.ndim = ndim;
-        tfDLMTensor->tensor.dl_tensor.data = const_cast<void *>((const void *)input_tensor.flat<T>().data());
+        tfDLMTensor->tensor.dl_tensor.data = const_cast<void *>((const void *)input_tensor.tensor_data().data());
 
         tfDLMTensor->tensor.dl_tensor.dtype = data_type;
         input_tensor.shape();
