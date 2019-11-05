@@ -3,10 +3,24 @@ from tensorflow.python.framework import load_library
 from tensorflow.python.platform import resource_loader
 import ctypes
 from .capsule_api import to_capsule, get_capsule_address
-# import capsule_api
+
+
+def get_op_files():
+    import os
+    pwd = os.getcwd()
+    dir1 = os.path.abspath(os.path.join(
+        os.getcwd(), os.pardir, "libtfdlpack.so"))
+    dir2 = os.path.abspath(os.path.join(
+        os.getcwd(), os.pardir, os.pardir, "build", "libtfdlpack.so"))
+    if os.path.exists(dir1):
+        return dir1
+    if os.path.exists(dir2):
+        return dir2
+    return "libtfdlpack.so"
+
 
 dlpack_ops = load_library.load_op_library(
-    '/home/ubuntu/dev/tfdlpack/build/libtfdlpack.so')
+    get_op_files())
 _to_dlpack_add = dlpack_ops.to_dlpack
 _from_dlpack = dlpack_ops.from_dlpack
 _get_device_and_dtype = dlpack_ops.get_device_and_dtype
