@@ -10,13 +10,14 @@ from .capsule_api import to_capsule, get_capsule_address
 # version number
 __version__ = libinfo.__version__
 
+
 def get_op_files():
     import os
-    pwd = os.getcwd()
+    pwd = os.path.dirname(os.path.realpath(__file__))
     dir1 = os.path.abspath(os.path.join(
-        os.getcwd(), os.pardir, "libtfdlpack.so"))
+        pwd, os.pardir, "libtfdlpack.so"))
     dir2 = os.path.abspath(os.path.join(
-        os.getcwd(), os.pardir, os.pardir, "build", "libtfdlpack.so"))
+        pwd, os.pardir, os.pardir, "build", "libtfdlpack.so"))
     if os.path.exists(dir1):
         return dir1
     if os.path.exists(dir2):
