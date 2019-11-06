@@ -22,7 +22,7 @@ def find_lib_path(name=None, search_path=None, optional=False):
     # NB: This will either be the source directory (if DGL is run
     # inplace) or the install directory (if DGL is installed).
     # An installed DGL's curr_path will look something like:
-    #   $PREFIX/lib/python3.6/site-packages/dgl/_ffi
+    #   $PREFIX/lib/python3.6/site-packages/tfdlpack/_ffi
     ffi_dir = os.path.dirname(os.path.abspath(os.path.expanduser(__file__)))
     source_dir = os.path.join(ffi_dir, "..", "..", "..")
     install_lib_dir = os.path.join(ffi_dir, "..", "..", "..", "..")
@@ -62,12 +62,12 @@ def find_lib_path(name=None, search_path=None, optional=False):
             lib_dll_path = [os.path.join(p, name) for p in dll_path]
     else:
         if sys.platform.startswith('win32'):
-            lib_dll_path = [os.path.join(p, 'libdgl.dll') for p in dll_path] +\
-                           [os.path.join(p, 'dgl.dll') for p in dll_path]
+            lib_dll_path = [os.path.join(p, 'libtfdlpack.dll') for p in dll_path] +\
+                           [os.path.join(p, 'tfdlpack.dll') for p in dll_path]
         elif sys.platform.startswith('darwin'):
-            lib_dll_path = [os.path.join(p, 'libdgl.dylib') for p in dll_path]
+            lib_dll_path = [os.path.join(p, 'libtfdlpack.dylib') for p in dll_path]
         else:
-            lib_dll_path = [os.path.join(p, 'libdgl.so') for p in dll_path]
+            lib_dll_path = [os.path.join(p, 'libtfdlpack.so') for p in dll_path]
 
     # try to find lib_dll_path
     lib_found = [p for p in lib_dll_path if os.path.exists(p) and os.path.isfile(p)]
