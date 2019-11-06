@@ -72,7 +72,6 @@ class ToDLPackOP : public OpKernel {
   explicit ToDLPackOP(OpKernelConstruction *context) : OpKernel(context) { }
   void Compute(OpKernelContext *context) override {
     // Grab the input tensor
-
     const Tensor &input_tensor = context->input(0);
     DLDeviceType device_type = DeviceOpTrait<DEVICE_TYPE>::device_type;
     int device_id = DeviceOpTrait<DEVICE_TYPE>::device_id(context);
