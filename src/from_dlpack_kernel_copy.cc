@@ -13,10 +13,12 @@ typedef Eigen::ThreadPoolDevice CPUDevice;
 typedef Eigen::GpuDevice GPUDevice;
 
 template <typename DEVICE_TYPE, typename T>
-class FromDLPackOP : public OpKernel {
- public:
+class FromDLPackOP : public OpKernel
+{
+public:
   explicit FromDLPackOP(OpKernelConstruction *context) : OpKernel(context) {}
-  void Compute(OpKernelContext *context) override {
+  void Compute(OpKernelContext *context) override
+  {
     const Tensor &input_tensor = context->input(0);
     uint64 address = input_tensor.flat<uint64>()(0);
     DLManagedTensor *dlm_tensor = static_cast<DLManagedTensor *>((void *)address);
@@ -27,7 +29,8 @@ class FromDLPackOP : public OpKernel {
     TensorShape shape_ = TensorShape();
     int ndim = dlm_tensor->dl_tensor.ndim;
     int64_t *shape = dlm_tensor->dl_tensor.shape;
-    for (int i = 0; i < ndim; i++) {
+    for (int i = 0; i < ndim; i++)
+    {
       shape_.AddDim(shape[i]);
     }
     int64 num_elements_ = shape_.num_elements();
@@ -36,11 +39,14 @@ class FromDLPackOP : public OpKernel {
     OP_REQUIRES_OK(context, context->allocate_output(0, shape_, &output_tensor));
     auto output_flat = output_tensor->flat<T>();
 
-    if (device == kDLCPU) {
+    if (device == kDLCPU)
+    {
       memcpy(output_flat.data(),
              dlm_tensor->dl_tensor.data,
              num_elements_ * (dlm_tensor->dl_tensor.dtype.bits) / 8);
-    } else {
+    }
+    else
+    {
       cudaMemcpy(output_flat.data(), dlm_tensor->dl_tensor.data,
                  num_elements_ * (dlm_tensor->dl_tensor.dtype.bits) / 8,
                  cudaMemcpyDeviceToDevice);
@@ -48,9 +54,19 @@ class FromDLPackOP : public OpKernel {
     dlm_tensor->deleter(const_cast<DLManagedTensor *>(dlm_tensor));
   }
 
- private:
+private:
   mutex mu_;
 };
 
-REGISTER_KERNEL_BUILDER(Name("FromDlpack").Device(DEVICE_CPU), FromDLPackOP<CPUDevice, float>);
-REGISTER_KERNEL_BUILDER(Name("FromDlpack").Device(DEVICE_GPU), FromDLPackOP<GPUDevice, float>);
+#define REGISTER_KERNEL_DISPATCH(T)                                                                                  \
+  REGISTER_KERNEL_BUILDER(Name("FromDlpack").Device(DEVICE_CPU).TypeConstraint<T>("T"), FromDLPackOP<CPUDevice, T>); \
+  REGISTER_KERNEL_BUILDER(Name("FromDlpack").Device(DEVICE_GPU).TypeConstraint<T>("T"), FromDLPackOP<GPUDevice, T>);
+
+REGISTER_KERNEL_DISPATCH(float);
+REGISTER_KERNEL_DISPATCH(double);
+REGISTER_KERNEL_DISPATCH(int32);
+REGISTER_KERNEL_DISPATCH(int64);
+REGISTER_KERNEL_DISPATCH(uint32);
+REGISTER_KERNEL_DISPATCH(uint64);
+
+#undef REGISTER_KERNEL_DISPATCH
