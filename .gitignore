@@ -3,3 +3,6 @@ build/
 *.so
 .python-version
 __pycache__
+*.egg-info
+*.egg
+.gdb_history

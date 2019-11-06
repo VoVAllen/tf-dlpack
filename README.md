@@ -5,6 +5,23 @@ Set allow growth, otherwise tf would take over whole gpu
 export TF_FORCE_GPU_ALLOW_GROWTH=true
 ```
 
+## Install
+
+### Dev Mode
+```python
+python setup.py develop
+```
+
+### Release Mode
+```python
+python setup.py install
+```
+
+
+
+
+## Build Manually
+
 Build
 ```
 mkdir build
