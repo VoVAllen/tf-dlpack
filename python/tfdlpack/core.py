@@ -10,21 +10,6 @@ from .capsule_api import to_capsule, get_capsule_address
 # version number
 __version__ = libinfo.__version__
 
-
-def get_op_files():
-    import os
-    pwd = os.path.dirname(os.path.realpath(__file__))
-    dir1 = os.path.abspath(os.path.join(
-        pwd, os.pardir, "libtfdlpack.so"))
-    dir2 = os.path.abspath(os.path.join(
-        pwd, os.pardir, os.pardir, "build", "libtfdlpack.so"))
-    if os.path.exists(dir1):
-        return dir1
-    if os.path.exists(dir2):
-        return dir2
-    return "libtfdlpack.so"
-
-
 dlpack_ops = load_library.load_op_library(libinfo.find_lib_path()[0])
 _to_dlpack_add = dlpack_ops.to_dlpack
 _from_dlpack = dlpack_ops.from_dlpack
