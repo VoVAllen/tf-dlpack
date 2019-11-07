@@ -1,3 +1,5 @@
+# pylint: disable=invalid-name
+"""Capsule API"""
 import ctypes
 # used for PyCapsule manipulation
 if hasattr(ctypes, 'pythonapi'):
@@ -7,6 +9,7 @@ if hasattr(ctypes, 'pythonapi'):
 
 
 def c_str(string):
+    """c_str type"""
     return ctypes.c_char_p(string.encode('utf-8'))
 
 
@@ -17,6 +20,7 @@ DLPackPyCapsuleDestructor = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
 
 
 def to_capsule(ad_tensor):
+    """convert address tensor to capsule"""
     add = int(ad_tensor.numpy())
     ptr = ctypes.c_void_p(add)
     capsule = ctypes.pythonapi.PyCapsule_New(ptr, _c_str_dltensor, DLPackPyCapsuleDestructor(0))
@@ -24,6 +28,7 @@ def to_capsule(ad_tensor):
 
 
 def get_capsule_address(dl_cap, consume=False):
+    """get address from capsule"""
     dltensor = ctypes.py_object(dl_cap)
     if ctypes.pythonapi.PyCapsule_IsValid(dltensor, _c_str_dltensor):
         ptr = ctypes.pythonapi.PyCapsule_GetPointer(dltensor, _c_str_dltensor)

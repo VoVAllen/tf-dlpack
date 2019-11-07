@@ -33,5 +33,6 @@ def test_from_torch_to_tf():
             assert th_device_id == tf_device.device_index
             assert np.array_equal(th_tensor.cpu().numpy(), tf_tensor.numpy())
 
+
 if __name__ == "__main__":
     test_from_torch_to_tf()
