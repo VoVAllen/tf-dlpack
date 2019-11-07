@@ -19,6 +19,12 @@ DataType toTFDataType(const DLDataType &dtype)
     case kDLUInt:
         switch (bits)
         {
+        case 8:
+            tf_dtype = DT_UINT8;
+            break;
+        case 16:
+            tf_dtype = DT_UINT16;
+            break;
         case 32:
             tf_dtype = DT_UINT32;
             break;

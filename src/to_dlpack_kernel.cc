@@ -44,8 +44,11 @@ class DataTypeTrait;
     static const uint16_t lanes = data_lanes;                   \
   };
 
+DATA_TYPE_DISPATCH(Eigen::half, kDLFloat, 16, 1);
 DATA_TYPE_DISPATCH(float, kDLFloat, 32, 1);
 DATA_TYPE_DISPATCH(double, kDLFloat, 64, 1);
+DATA_TYPE_DISPATCH(int8, kDLInt, 8, 1);
+DATA_TYPE_DISPATCH(int16, kDLInt, 16, 1);
 DATA_TYPE_DISPATCH(int32, kDLInt, 32, 1);
 DATA_TYPE_DISPATCH(int64, kDLInt, 64, 1);
 DATA_TYPE_DISPATCH(uint32, kDLUInt, 32, 1);
@@ -111,8 +114,11 @@ class ToDLPackOP : public OpKernel {
   REGISTER_KERNEL_BUILDER(Name("ToDlpack").Device(DEVICE_CPU).TypeConstraint<T>("T"), ToDLPackOP<CPUDevice, T>); \
   REGISTER_KERNEL_BUILDER(Name("ToDlpack").Device(DEVICE_GPU).TypeConstraint<T>("T").HostMemory("out"), ToDLPackOP<GPUDevice, T>);
 
+REGISTER_KERNEL_DISPATCH(Eigen::half);
 REGISTER_KERNEL_DISPATCH(float);
 REGISTER_KERNEL_DISPATCH(double);
+REGISTER_KERNEL_DISPATCH(int8);
+REGISTER_KERNEL_DISPATCH(int16);
 REGISTER_KERNEL_DISPATCH(int32);
 REGISTER_KERNEL_DISPATCH(int64);
 REGISTER_KERNEL_DISPATCH(uint32);
