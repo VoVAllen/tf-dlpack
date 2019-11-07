@@ -5,6 +5,7 @@
  */
 #include <dlpack/dlpack.h>
 #include <tensorflow/core/framework/op_kernel.h>
+#include <cstdint>
 #include "util.h"
 
 using namespace tensorflow;
