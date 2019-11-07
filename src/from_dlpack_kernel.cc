@@ -50,9 +50,9 @@ class DLPackAllocator : public Allocator {
 
   void DeallocateRaw(void *ptr) {
     // This would lead to double free, haven't figure out the problem
-    // dlm_tensor_->deleter(const_cast<DLManagedTensor *>(dlm_tensor_));
-    std::cout << "Deconstruct dlpack tensor" << std::endl;
-    // delete this;
+    dlm_tensor_->deleter(const_cast<DLManagedTensor *>(dlm_tensor_));
+    // std::cout << "Deconstruct dlpack tensor" << std::endl;
+    delete this;
   };
 
   TensorShape get_shape() {
