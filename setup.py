@@ -24,7 +24,7 @@ class CMakeBuild(build_ext):
                                ", ".join(e.name for e in self.extensions))
 
         if platform.system() == "Windows":
-            raise RuntimeError("Windows not supported")
+            raise RuntimeError("Windows not currently supported")
 
         for ext in self.extensions:
             self.build_extension(ext)
@@ -34,7 +34,6 @@ class CMakeBuild(build_ext):
             self.get_ext_fullpath(ext.name)))
         extdir = os.path.join(extdir, "build")
 
-        # self.build_temp = os.path.join(extdir, "build")
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
 
@@ -42,8 +41,6 @@ class CMakeBuild(build_ext):
         build_args = ['--config', cfg]
 
         env = os.environ.copy()
-        # env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
-        #                                                       self.distribution.get_version())
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
         subprocess.check_call(['cmake', ext.sourcedir] +
@@ -55,14 +52,13 @@ class CMakeBuild(build_ext):
 setup(
     name='tfdlpack',
     version='0.0.1',
-    author='AZ',
-    # author_email='dean0x7d@gmail.com',
-    # description='A test project using pybind11 and CMake',
+    author='DGL Team',
+    author_email='allen.zhou@nyu.edu',
+    description='DLPack for tensorflow',
     package_dir={"tfdlpack": "python/tfdlpack/"},
     packages=["tfdlpack"],
     long_description='',
     ext_modules=[CMakeExtension('tfdlpack')],
     cmdclass=dict(build_ext=CMakeBuild),
-    # data_file
     zip_safe=False,
 )

@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <dlpack/dlpack.h>
 #include <tensorflow/core/framework/op_kernel.h>
+#include "util.h"
 
 using namespace tensorflow;
 namespace tf = tensorflow;
@@ -8,64 +9,65 @@ namespace tf = tensorflow;
 typedef Eigen::ThreadPoolDevice CPUDevice;
 typedef Eigen::GpuDevice GPUDevice;
 
-DataType toTFDataType(const DLDataType &dtype) {
-  DataType tf_dtype = DT_INVALID;
-  int code = dtype.code;
-  int bits = dtype.bits;
-  switch (code) {
+DataType toTFDataType(const DLDataType &dtype)
+{
+    DataType tf_dtype = DT_INVALID;
+    int code = dtype.code;
+    int bits = dtype.bits;
+    switch (code)
+    {
     case kDLUInt:
-      switch (bits) {
+        switch (bits)
+        {
         case 32:
-          tf_dtype = DT_UINT32;
-          break;
+            tf_dtype = DT_UINT32;
+            break;
         case 64:
-          tf_dtype = DT_UINT64;
-          break;
+            tf_dtype = DT_UINT64;
+            break;
         default:
-          0;
-          std::cout << "Unsupported kUInt bits" << std::endl;
-      }
-      break;
+            std::cout << "Unsupported kUInt bits" << std::endl;
+        }
+        break;
     case kDLInt:
-      switch (bits) {
+        switch (bits)
+        {
         case 8:
-          tf_dtype = DT_INT8;
-          break;
+            tf_dtype = DT_INT8;
+            break;
         case 16:
-          tf_dtype = DT_INT16;
-          break;
+            tf_dtype = DT_INT16;
+            break;
         case 32:
-          tf_dtype = DT_INT32;
-          break;
+            tf_dtype = DT_INT32;
+            break;
         case 64:
-          tf_dtype = DT_INT64;
-          break;
+            tf_dtype = DT_INT64;
+            break;
         default:
-          0;
-          std::cout << "Unsupported kInt bits" <<std::endl;
-      }
-      break;
+            std::cout << "Unsupported kInt bits" << std::endl;
+        }
+        break;
     case kDLFloat:
-      switch (bits) {
+        switch (bits)
+        {
         case 16:
-          tf_dtype = DT_HALF;
-          break;
+            tf_dtype = DT_HALF;
+            break;
         case 32:
-          tf_dtype = DT_FLOAT;
-          break;
+            tf_dtype = DT_FLOAT;
+            break;
         case 64:
-          tf_dtype = DT_DOUBLE;
-          break;
+            tf_dtype = DT_DOUBLE;
+            break;
         default:
-          0;
-          std::cout << "Unsupported kFloat bits" << std::endl;
-      }
-      break;
+            std::cout << "Unsupported kFloat bits" << std::endl;
+        }
+        break;
     default:
-      0;
-      std::cout << "Unsupported code" << std::endl;
-  }
-  return tf_dtype;
+        std::cout << "Unsupported code" << std::endl;
+    }
+    return tf_dtype;
 }
 
 class GetDeviceAndDTypeOP : public OpKernel {

@@ -17,7 +17,7 @@ REGISTER_OP("FromDlpack")
 
 // Return a tensor with shape {3}. First is device type, and second is device id.
 // Third is the corresponding value of TF_DTYPE
-// Based on DLPack Protocal
+// Device type is based on DLPack Protocal
 REGISTER_OP("GetDeviceAndDtype")
   .Input("in : uint64")
   .Output("out : int32");

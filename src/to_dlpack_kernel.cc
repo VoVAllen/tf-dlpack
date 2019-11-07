@@ -1,9 +1,7 @@
 #include <cstdio>
-#include <cuda_runtime.h>
 #include <dlpack/dlpack.h>
 #include <tensorflow/core/framework/op_kernel.h>
 #include <tensorflow/core/framework/tensor_reference.h>
-// #include "tensorflow/core/kernels/tensor_cord.h"
 
 using namespace tensorflow;
 namespace tf = tensorflow;
@@ -34,7 +32,6 @@ class DeviceOpTrait<GPUDevice> {
   }
 };
 
-// TODO: Runtime check instead of using template  
 template <typename DATA_TYPE>
 class DataTypeTrait;
 
@@ -102,20 +99,17 @@ class ToDLPackOP : public OpKernel {
 
     Tensor *output_tensor = NULL;
     TensorShape shape = TensorShape({1});
-    OP_REQUIRES_OK(context, context->allocate_output(0, shape, &output_tensor));
+    AllocatorAttributes attr;
+    attr.set_on_host(true);
+    OP_REQUIRES_OK(context, context->allocate_output(0, shape, &output_tensor, attr));
     auto output_flat = output_tensor->flat<uint64>();
-
-    if (device_type == kDLCPU) {
-      output_flat(0) = add;
-    } else {
-      cudaMemcpy(output_flat.data(), &add, sizeof(uint64), cudaMemcpyHostToDevice);
-    }
+    output_flat(0) = add;
   }
 };
 
 #define REGISTER_KERNEL_DISPATCH(T) \
   REGISTER_KERNEL_BUILDER(Name("ToDlpack").Device(DEVICE_CPU).TypeConstraint<T>("T"), ToDLPackOP<CPUDevice, T>); \
-  REGISTER_KERNEL_BUILDER(Name("ToDlpack").Device(DEVICE_GPU).TypeConstraint<T>("T"), ToDLPackOP<GPUDevice, T>);
+  REGISTER_KERNEL_BUILDER(Name("ToDlpack").Device(DEVICE_GPU).TypeConstraint<T>("T").HostMemory("out"), ToDLPackOP<GPUDevice, T>);
 
 REGISTER_KERNEL_DISPATCH(float);
 REGISTER_KERNEL_DISPATCH(double);

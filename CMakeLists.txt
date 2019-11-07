@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.13)
 
 project(tfdlpack C CXX)
 
-include(cmake/util/FindCUDA.cmake)
-
 add_definitions(-std=c++11 -fPIC)
 
 if(NOT PYTHON_EXECUTABLE)
@@ -31,26 +29,20 @@ execute_process(
 )
 message(STATUS "TF_LFLAGS = ${TF_LFLAGS}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TF_CFLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 ${TF_CFLAGS}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -D_GLIBCXX_USE_CXX11_ABI=0 ${TF_CFLAGS}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g3 -ggdb -D_GLIBCXX_USE_CXX11_ABI=0 ${TF_CFLAGS}")
 
-find_cuda(ON REQUIRED)
-if(NOT CUDA_FOUND)
-  message(FATAL_ERROR "Cannot find CUDA.")
-endif()
-
 include_directories(third_party/dlpack/include)
-include_directories(${CUDA_INCLUDE_DIRS})
 
 file(GLOB SRC
   src/dlpack_op.cc
   src/to_dlpack_kernel.cc
   src/get_device_and_dtype_kernel.cc
-  src/from_dlpack_kernel_copy.cc
+  src/from_dlpack_kernel.cc
 )
 
-cuda_add_library(tfdlpack SHARED ${SRC})
+add_library(tfdlpack SHARED ${SRC})
 target_link_libraries(tfdlpack ${TF_LFLAGS})
 
 install(TARGETS tfdlpack DESTINATION tfdlpack)

@@ -10,6 +10,7 @@ from .capsule_api import to_capsule, get_capsule_address
 # version number
 __version__ = libinfo.__version__
 
+# print(libinfo.find_lib_path()[0])
 dlpack_ops = load_library.load_op_library(libinfo.find_lib_path()[0])
 _to_dlpack_add = dlpack_ops.to_dlpack
 _from_dlpack = dlpack_ops.from_dlpack
@@ -42,8 +43,9 @@ def from_dlpack(dl_capsule):
     else:
         raise RuntimeError("Unsupported Device")
     tf_device = "/{}:{}".format(tf_device_type, tf_device_id)
-    with tf.device(tf_device):
+    with tf.device("cpu:0"):
         ad_tensor = tf.constant([ptr], dtype=tf.uint64)
+    with tf.device(tf_device):
         # tf_tensor = _from_dlpack(ad_tensor, T=tf.float32)
         tf_tensor = _from_dlpack(ad_tensor, T=tf.DType(dtype))
 
