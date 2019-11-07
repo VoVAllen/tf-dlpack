@@ -60,10 +60,9 @@ DATA_TYPE_DISPATCH(uint64, kDLUInt, 64, 1);
 struct TFDLMTensor {
   TensorReference *handle;
   DLManagedTensor tensor;
-}
+};
 
-void
-deleter(DLManagedTensor *arg) {
+void deleter(DLManagedTensor *arg) {
   TFDLMTensor *owner = static_cast<TFDLMTensor *>(arg->manager_ctx);
   owner->handle->Unref();
   delete owner;
