@@ -3,7 +3,7 @@ import torch as th
 from torch.utils.dlpack import from_dlpack, to_dlpack
 from tfdlpack import from_dlpack as tf_from_dlpack
 import gpustat
-
+import pytest
 
 def get_gpu_memory_used():
     gpu_query = gpustat.GPUStatCollection.new_query()
@@ -16,11 +16,16 @@ def get_capsule():
     dl_cap = to_dlpack(a)
     return dl_cap
 
-m1 = get_gpu_memory_used()
-c = get_capsule()
-m2 = get_gpu_memory_used()
-tf_t = tf_from_dlpack(c)
-m3 = get_gpu_memory_used()
-print(m1)
-print(m2)
-print(m3)
+@pytest.mark.skip
+def test_zero_copy():
+    m1 = get_gpu_memory_used()
+    c = get_capsule()
+    m2 = get_gpu_memory_used()
+    tf_t = tf_from_dlpack(c)
+    m3 = get_gpu_memory_used()
+    print(m1)
+    print(m2)
+    print(m3)
+
+if __name__ == "__main__":
+    test_zero_copy()
