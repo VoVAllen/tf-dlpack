@@ -1,7 +1,12 @@
-#include <cstdio>
+/*!
+ *  Copyright (c) 2019 by Contributors
+ * \file to_dlpack_kernel.cc
+ * \brief to dlpack kernel
+ */
 #include <dlpack/dlpack.h>
 #include <tensorflow/core/framework/op_kernel.h>
 #include <tensorflow/core/framework/tensor_reference.h>
+#include <cstdint>
 
 using namespace tensorflow;
 namespace tf = tensorflow;
@@ -16,9 +21,7 @@ template <>
 class DeviceOpTrait<CPUDevice> {
  public:
   static const DLDeviceType device_type = kDLCPU;
-  static int device_id(OpKernelContext *context) {
-    return 0;
-  }
+  static int device_id(OpKernelContext *context) { return 0; }
 };
 
 template <>
@@ -57,19 +60,19 @@ DATA_TYPE_DISPATCH(uint64, kDLUInt, 64, 1);
 struct TFDLMTensor {
   TensorReference *handle;
   DLManagedTensor tensor;
-};
+}
 
-void deleter(DLManagedTensor *arg) {
+void
+deleter(DLManagedTensor *arg) {
   TFDLMTensor *owner = static_cast<TFDLMTensor *>(arg->manager_ctx);
   owner->handle->Unref();
   delete owner;
-};
+}
 
 template <typename DEVICE_TYPE, typename T>
 class ToDLPackOP : public OpKernel {
-
  public:
-  explicit ToDLPackOP(OpKernelConstruction *context) : OpKernel(context) { }
+  explicit ToDLPackOP(OpKernelConstruction *context) : OpKernel(context) {}
   void Compute(OpKernelContext *context) override {
     // Grab the input tensor
     const Tensor &input_tensor = context->input(0);
@@ -78,16 +81,18 @@ class ToDLPackOP : public OpKernel {
     TFDLMTensor *tfDLMTensor(new TFDLMTensor);
     DLContext ctx = {device_type, device_id};
 
-    DLDataType data_type = {DataTypeTrait<T>::code, DataTypeTrait<T>::bits, DataTypeTrait<T>::lanes};
+    DLDataType data_type = {DataTypeTrait<T>::code, DataTypeTrait<T>::bits,
+                            DataTypeTrait<T>::lanes};
 
-    TensorReference *tensor_ref = new TensorReference(input_tensor); // This will call buf_->Ref()
+    TensorReference *tensor_ref = new TensorReference(input_tensor);  // This will call buf_->Ref()
     tfDLMTensor->handle = tensor_ref;
     tfDLMTensor->tensor.manager_ctx = tfDLMTensor;
     tfDLMTensor->tensor.deleter = &deleter;
     tfDLMTensor->tensor.dl_tensor.ctx = ctx;
     int ndim = input_tensor.dims();
     tfDLMTensor->tensor.dl_tensor.ndim = ndim;
-    tfDLMTensor->tensor.dl_tensor.data = const_cast<void *>((const void *)input_tensor.tensor_data().data());
+    tfDLMTensor->tensor.dl_tensor.data =
+        const_cast<void *>((const void *)input_tensor.tensor_data().data());
 
     tfDLMTensor->tensor.dl_tensor.dtype = data_type;
     input_tensor.shape();
@@ -98,7 +103,7 @@ class ToDLPackOP : public OpKernel {
     tfDLMTensor->tensor.dl_tensor.shape = shape_arr;
     tfDLMTensor->tensor.dl_tensor.strides = nullptr;
     tfDLMTensor->tensor.dl_tensor.byte_offset = 0;
-    uint64 add = (uint64)(void *)(&tfDLMTensor->tensor);
+    uint64 add = reinterpret_cast<std::uintptr_t>(&tfDLMTensor->tensor);
 
     Tensor *output_tensor = NULL;
     TensorShape shape = TensorShape({1});
@@ -110,9 +115,12 @@ class ToDLPackOP : public OpKernel {
   }
 };
 
-#define REGISTER_KERNEL_DISPATCH(T) \
-  REGISTER_KERNEL_BUILDER(Name("ToDlpack").Device(DEVICE_CPU).TypeConstraint<T>("T"), ToDLPackOP<CPUDevice, T>); \
-  REGISTER_KERNEL_BUILDER(Name("ToDlpack").Device(DEVICE_GPU).TypeConstraint<T>("T").HostMemory("out"), ToDLPackOP<GPUDevice, T>);
+#define REGISTER_KERNEL_DISPATCH(T)                                                   \
+  REGISTER_KERNEL_BUILDER(Name("ToDlpack").Device(DEVICE_CPU).TypeConstraint<T>("T"), \
+                          ToDLPackOP<CPUDevice, T>);                                  \
+  REGISTER_KERNEL_BUILDER(                                                            \
+      Name("ToDlpack").Device(DEVICE_GPU).TypeConstraint<T>("T").HostMemory("out"),   \
+      ToDLPackOP<GPUDevice, T>);
 
 REGISTER_KERNEL_DISPATCH(Eigen::half);
 REGISTER_KERNEL_DISPATCH(float);

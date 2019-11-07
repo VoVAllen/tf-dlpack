@@ -1,6 +1,11 @@
+/*!
+ *  Copyright (c) 2019 by Contributors
+ * \file util.h
+ * \brief TF data type utilities
+ */
+
 #pragma once
 
-#include <cstdio>
 #include <dlpack/dlpack.h>
 #include <tensorflow/core/framework/op_kernel.h>
 

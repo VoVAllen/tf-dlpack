@@ -1,3 +1,8 @@
+/*!
+ *  Copyright (c) 2019 by Contributors
+ * \file dlpack_op.cc
+ * \brief dlpack op registration
+ */
 #include <tensorflow/core/framework/op.h>
 
 using namespace tensorflow;

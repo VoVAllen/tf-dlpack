@@ -1,4 +1,8 @@
-#include <cstdio>
+/*!
+ *  Copyright (c) 2019 by Contributors
+ * \file get_device_and_dtype_kernel.cc
+ * \brief get device and dtype kernel
+ */
 #include <dlpack/dlpack.h>
 #include <tensorflow/core/framework/op_kernel.h>
 #include "util.h"
@@ -9,81 +13,75 @@ namespace tf = tensorflow;
 typedef Eigen::ThreadPoolDevice CPUDevice;
 typedef Eigen::GpuDevice GPUDevice;
 
-DataType toTFDataType(const DLDataType &dtype)
-{
-    DataType tf_dtype = DT_INVALID;
-    int code = dtype.code;
-    int bits = dtype.bits;
-    switch (code)
-    {
+DataType toTFDataType(const DLDataType &dtype) {
+  DataType tf_dtype = DT_INVALID;
+  int code = dtype.code;
+  int bits = dtype.bits;
+  switch (code) {
     case kDLUInt:
-        switch (bits)
-        {
+      switch (bits) {
         case 8:
-            tf_dtype = DT_UINT8;
-            break;
+          tf_dtype = DT_UINT8;
+          break;
         case 16:
-            tf_dtype = DT_UINT16;
-            break;
+          tf_dtype = DT_UINT16;
+          break;
         case 32:
-            tf_dtype = DT_UINT32;
-            break;
+          tf_dtype = DT_UINT32;
+          break;
         case 64:
-            tf_dtype = DT_UINT64;
-            break;
+          tf_dtype = DT_UINT64;
+          break;
         default:
-            std::cout << "Unsupported kUInt bits" << std::endl;
-        }
-        break;
+          LOG(INFO) << "Unsupported kUInt bits";
+      }
+      break;
     case kDLInt:
-        switch (bits)
-        {
+      switch (bits) {
         case 8:
-            tf_dtype = DT_INT8;
-            break;
+          tf_dtype = DT_INT8;
+          break;
         case 16:
-            tf_dtype = DT_INT16;
-            break;
+          tf_dtype = DT_INT16;
+          break;
         case 32:
-            tf_dtype = DT_INT32;
-            break;
+          tf_dtype = DT_INT32;
+          break;
         case 64:
-            tf_dtype = DT_INT64;
-            break;
+          tf_dtype = DT_INT64;
+          break;
         default:
-            std::cout << "Unsupported kInt bits" << std::endl;
-        }
-        break;
+          LOG(INFO) << "Unsupported kInt bits";
+      }
+      break;
     case kDLFloat:
-        switch (bits)
-        {
+      switch (bits) {
         case 16:
-            tf_dtype = DT_HALF;
-            break;
+          tf_dtype = DT_HALF;
+          break;
         case 32:
-            tf_dtype = DT_FLOAT;
-            break;
+          tf_dtype = DT_FLOAT;
+          break;
         case 64:
-            tf_dtype = DT_DOUBLE;
-            break;
+          tf_dtype = DT_DOUBLE;
+          break;
         default:
-            std::cout << "Unsupported kFloat bits" << std::endl;
-        }
-        break;
+          LOG(INFO) << "Unsupported kFloat bits";
+      }
+      break;
     default:
-        std::cout << "Unsupported code" << std::endl;
-    }
-    return tf_dtype;
+      LOG(INFO) << "Unsupported code";
+  }
+  return tf_dtype;
 }
 
 class GetDeviceAndDTypeOP : public OpKernel {
-
  public:
-  explicit GetDeviceAndDTypeOP(OpKernelConstruction *context) : OpKernel(context) { }
+  explicit GetDeviceAndDTypeOP(OpKernelConstruction *context) : OpKernel(context) {}
   void Compute(OpKernelContext *context) override {
     const Tensor &input_tensor = context->input(0);
     uint64 address = input_tensor.flat<uint64>()(0);
-    DLManagedTensor *dl_tensor = static_cast<DLManagedTensor *>((void *)address);
+    DLManagedTensor *dl_tensor = static_cast<DLManagedTensor *>(reinterpret_cast<void *>(address));
     Tensor *output_tensor = NULL;
     TensorShape shape = TensorShape({3});
     OP_REQUIRES_OK(context, context->allocate_output(0, shape, &output_tensor));
