@@ -1,0 +1,6 @@
+[
+  "test/test_from_dlpack.py::test_from_torch_to_tf",
+  "test/test_get_device.py::test_get_op",
+  "test/test_to_dlpack.py::test_from_tf_to_torch",
+  "test/test_zero_copy.py::test_zero_copy"
+]

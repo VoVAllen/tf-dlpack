@@ -19,7 +19,7 @@ DLPackPyCapsuleDestructor = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
 def to_capsule(ad_tensor):
     add = int(ad_tensor.numpy())
     ptr = ctypes.c_void_p(add)
-    capsule = ctypes.pythonapi.PyCapsule_New(ptr, _c_str_dltensor, None)
+    capsule = ctypes.pythonapi.PyCapsule_New(ptr, _c_str_dltensor, DLPackPyCapsuleDestructor(0))
     return capsule
 
 

@@ -19,7 +19,9 @@ _get_device_and_dtype = dlpack_ops.get_device_and_dtype
 def to_dlpack(tf_tensor):
     """Convert the given tensorflow tensor to DLPack format.
     """
-    return to_capsule(_to_dlpack_add(tf_tensor))
+    with tf.device(tf_tensor.device):
+        cap = to_capsule(_to_dlpack_add(tf_tensor))
+    return cap
 
 def get_device_and_dtype(dl_capsule):
     ptr = get_capsule_address(dl_capsule)
