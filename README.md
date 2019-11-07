@@ -7,14 +7,23 @@ export TF_FORCE_GPU_ALLOW_GROWTH=true
 
 ## Install
 
+### Pip install
+```bash
+pip install git+https://github.com/VoVAllen/tf-dlpack.git
+```
+
 ### Dev Mode
-```python
+```bash
 python setup.py develop
+# or
+pip install -e .
 ```
 
 ### Release Mode
-```python
+```bash
 python setup.py install
+# or
+pip install .
 ```
 
 
