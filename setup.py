@@ -32,14 +32,13 @@ class CMakeBuild(build_ext):
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(
             self.get_ext_fullpath(ext.name)))
-        extdir = os.path.join(extdir, "build")
+        extdir = os.path.join(extdir, "tfdlpack", "build") # Not sure whether this is fine
 
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
 
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
-
         env = os.environ.copy()
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
