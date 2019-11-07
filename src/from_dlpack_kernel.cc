@@ -4,8 +4,6 @@
 #include <tensorflow/core/framework/allocator.h>
 #include <tensorflow/core/framework/tensor_reference.h>
 #include "util.h"
-// #include "get_device_and_dtype_kernel.cc"
-// #include "tensorflow/core/kernels/tensor_cord.h"
 
 
 using namespace tensorflow;
