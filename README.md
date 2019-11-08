@@ -13,21 +13,19 @@ export TF_FORCE_GPU_ALLOW_GROWTH=true
 pip install git+https://github.com/VoVAllen/tf-dlpack.git
 ```
 
-### Dev Mode
-```bash
-python setup.py develop
-# or
-pip install -e .
-```
-
-### Release Mode
+### Local install
 ```bash
 python setup.py install
 # or
 pip install .
 ```
 
-
+## Usage
+```python
+import tfdlpack
+dl_capsule = tfdlpack.to_dlpack(tf_tensor)    # Convert tf tensor to dlpack capsule
+tf_tensor = tfdlpack.from_dlpack(dl_capsule)  # Convert dlpack capsule to tf tensor
+```
 
 
 ## Build Manually
