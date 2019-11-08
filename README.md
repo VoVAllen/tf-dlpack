@@ -45,3 +45,7 @@ And export the python path to `import tfdlpack`
 ```bash
 export PYTHONPATH=/home/ubuntu/dev/tfdlpack/python/:${PYTHONPATH}
 ```
+
+## License
+
+[Apache License 2.0](LICENSE)
