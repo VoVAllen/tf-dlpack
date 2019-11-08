@@ -35,7 +35,8 @@ pipeline {
         } 
       }
       steps {
-        sh "python -m pip install -e ."
+        sh "git submodule update --recursive --init"
+        sh "python -m pip install ."
       }
       post {
         always {
