@@ -27,7 +27,7 @@ pipeline {
       }
     }
 
-    stage("Build") {
+    stage("Build and Test") {
       agent { 
         docker { 
           image "dgllib/tfdlpack-test" 
@@ -35,8 +35,9 @@ pipeline {
         } 
       }
       steps {
-        sh "git submodule update --recursive --init"
+        init_git()
         sh "python -m pip install ."
+        sh "python -m pytest tests"
       }
       post {
         always {
@@ -45,21 +46,5 @@ pipeline {
       }
     }
 
-    stage("Test") {
-      agent { 
-        docker { 
-          image "dgllib/tfdlpack-test" 
-          args "--runtime nvidia"
-        } 
-      }
-      steps {
-        sh "python -m pytest tests"
-      }
-      post {
-        always {
-          cleanWs disableDeferredWipeout: true, deleteDirs: true
-        }
-      }
-    }   
   }
 }
