@@ -52,7 +52,7 @@ pipeline {
         } 
       }
       steps {
-        sh "python -m pytest"
+        sh "python -m pytest tests"
       }
       post {
         always {
