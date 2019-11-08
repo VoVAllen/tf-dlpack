@@ -1,4 +1,5 @@
 # DLPack for TF
+[![Build Status](http://ci.dgl.ai:80/buildStatus/icon?job=tf-dlpack/master)](http://ci.dgl.ai:80/job/tf-dlpack/job/master/)
 
 Set allow growth, otherwise tf would take over whole gpu
 ```bash
