@@ -1,4 +1,4 @@
 
 FROM tensorflow/tensorflow:2.0.0-gpu-py3
 
-RUN pip3 install torch==1.3.0 pytest gpustat
+RUN pip3 install -y torch==1.3.0 pytest gpustat
