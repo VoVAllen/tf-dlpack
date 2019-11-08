@@ -28,41 +28,37 @@ pipeline {
     }
 
     stage("Build") {
-      stage("Build") {
-        agent { 
-          docker { 
-            image "dgllib/tfdlpack-test" 
-            args "--runtime nvidia"
-          } 
-        }
-        steps {
-          sh "python -m pip install -e ."
-        }
-        post {
-          always {
-            cleanWs disableDeferredWipeout: true, deleteDirs: true
-          }
+      agent { 
+        docker { 
+          image "dgllib/tfdlpack-test" 
+          args "--runtime nvidia"
+        } 
+      }
+      steps {
+        sh "python -m pip install -e ."
+      }
+      post {
+        always {
+          cleanWs disableDeferredWipeout: true, deleteDirs: true
         }
       }
     }
 
     stage("Test") {
-      stage("Test") {
-        agent { 
-          docker { 
-            image "dgllib/tfdlpack-test" 
-            args "--runtime nvidia"
-          } 
+      agent { 
+        docker { 
+          image "dgllib/tfdlpack-test" 
+          args "--runtime nvidia"
+        } 
+      }
+      steps {
+        sh "python -m pytest"
+      }
+      post {
+        always {
+          cleanWs disableDeferredWipeout: true, deleteDirs: true
         }
-        steps {
-          sh "python -m pytest"
-        }
-        post {
-          always {
-            cleanWs disableDeferredWipeout: true, deleteDirs: true
-          }
-        }
-      }   
-    }
+      }
+    }   
   }
 }
