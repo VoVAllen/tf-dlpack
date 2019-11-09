@@ -1,12 +1,14 @@
 # DLPack for TF
-[![Build Status](http://ci.dgl.ai:80/buildStatus/icon?job=tf-dlpack/master)](http://ci.dgl.ai:80/job/tf-dlpack/job/master/)
+[![Build Status](http://ci.dgl.ai:80/buildStatus/icon?job=tf-dlpack/master)](http://ci.dgl.ai:80/job/tf-dlpack/job/master/) 
 
+Notes: Currently only tested under tensorflow 2.0's eager mode. Implementation details could be found [here](https://github.com/VoVAllen/tf-dlpack/issues/3).
+
+
+## Install
 Set allow growth, otherwise tf would take over whole gpu
 ```bash
 export TF_FORCE_GPU_ALLOW_GROWTH=true
 ```
-
-## Install
 
 ### Pip install
 ```bash
