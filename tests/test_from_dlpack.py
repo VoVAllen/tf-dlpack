@@ -6,6 +6,7 @@ import tensorflow as tf
 from torch.utils.dlpack import from_dlpack as th_from_dlpack
 from torch.utils.dlpack import to_dlpack as th_to_dlpack
 import torch as th
+th.cuda.init()
 
 types = [np.float16, np.float32, np.float32,
          np.int8, np.int16, np.int32, np.int64]

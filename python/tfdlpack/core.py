@@ -12,7 +12,7 @@ __version__ = libinfo.__version__
 
 # print(libinfo.find_lib_path()[0])
 dlpack_ops = load_library.load_op_library(libinfo.find_lib_path()[0])
-_to_dlpack_add = dlpack_ops.to_dlpack
+_to_dlpack_address = dlpack_ops.to_dlpack
 _from_dlpack = dlpack_ops.from_dlpack
 _get_device_and_dtype = dlpack_ops.get_device_and_dtype
 
@@ -21,7 +21,7 @@ def to_dlpack(tf_tensor):
     """Convert the given tensorflow tensor to DLPack format.
     """
     with tf.device(tf_tensor.device):
-        cap = to_capsule(_to_dlpack_add(tf_tensor))
+        cap = to_capsule(_to_dlpack_address(tf_tensor))
     return cap
 
 
