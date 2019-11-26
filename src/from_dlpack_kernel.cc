@@ -3,6 +3,7 @@
  * \file from_dlpack_kernel.cc
  * \brief from dlpack kernel
  */
+#include <cuda_runtime.h>
 #include <dlpack/dlpack.h>
 #include <tensorflow/core/framework/allocator.h>
 #include <tensorflow/core/framework/op_kernel.h>
@@ -16,9 +17,14 @@ namespace tf = tensorflow;
 typedef Eigen::ThreadPoolDevice CPUDevice;
 typedef Eigen::GpuDevice GPUDevice;
 
+inline bool isAligned(size_t alignment, void *data_ptr) {
+  auto iptr = reinterpret_cast<std::uintptr_t>(data_ptr);
+  return (iptr % alignment == 0);
+}
+
 class DLPackAllocator : public Allocator {
  public:
-  static constexpr size_t kAllocatorAlignment = 1;
+  static constexpr size_t kAllocatorAlignment = 64;
 
   explicit DLPackAllocator(DLManagedTensor *dlm_tensor) {
     dlm_tensor_ = dlm_tensor;
@@ -38,13 +44,17 @@ class DLPackAllocator : public Allocator {
 
   void *AllocateRaw(size_t alignment, size_t num_bytes) {
     if (num_elements_ * (dlm_tensor_->dl_tensor.dtype.bits) / 8 != num_bytes) {
-      std::cout << "Invalid allocation bytes" << std::endl;
+      allocation_status_ =
+          errors::Internal("Invalid number of bytes for DLPack Tensor");
+      return nullptr;
     }
-    auto iptr = reinterpret_cast<std::uintptr_t>(data_);
-    if (!(iptr % alignment)) {
-      std::cout << "Memory not aligned" << std::endl;
+    if (isAligned(alignment, data_)) {
+      return data_;
+    } else {
+      allocation_status_ =
+          errors::Internal("DLPack Tensor has wrong alignment");
+      return nullptr;
     }
-    return data_;
   }
 
   void DeallocateRaw(void *ptr) {
@@ -54,13 +64,19 @@ class DLPackAllocator : public Allocator {
     delete this;
   }
 
+  const Status &allocation_status() const { return allocation_status_; }
+
   TensorShape get_shape() { return shape_; }
+  int64 get_size() {
+    return num_elements_ * (dlm_tensor_->dl_tensor.dtype.bits) / 8;
+  }
 
  private:
   DLManagedTensor *dlm_tensor_;
   void *data_;
   int64 num_elements_;
   TensorShape shape_;
+  Status allocation_status_;
 };
 
 class FromDLPackOP : public OpKernel {
@@ -69,15 +85,41 @@ class FromDLPackOP : public OpKernel {
   void Compute(OpKernelContext *context) override {
     const Tensor &input_tensor = context->input(0);
     uint64 address = input_tensor.flat<uint64>()(0);
-    DLManagedTensor *dlm_tensor = static_cast<DLManagedTensor *>(reinterpret_cast<void *>(address));
+    DLManagedTensor *dlm_tensor =
+        static_cast<DLManagedTensor *>(reinterpret_cast<void *>(address));
     DLDataType dtype = dlm_tensor->dl_tensor.dtype;
 
     DLPackAllocator *dlpack_allocator = new DLPackAllocator(dlm_tensor);
-    DataType tf_dtype = toTFDataType(dtype);
-    Tensor output_tensor(dlpack_allocator, tf_dtype, dlpack_allocator->get_shape());
-    OP_REQUIRES_OK(context, context->set_output("out", output_tensor));
+    // Alignment is always 64 bytes for CPU and GPU in TF
+    if (isAligned(64, dlm_tensor->dl_tensor.data)) {
+      // Aligned tensor using DLPackAllocator to allocate memory
+      DataType tf_dtype = toTFDataType(dtype);
+      Tensor output_tensor(dlpack_allocator, tf_dtype,
+                           dlpack_allocator->get_shape());
+      OP_REQUIRES_OK(context, dlpack_allocator->allocation_status());
+      OP_REQUIRES_OK(context, context->set_output("out", output_tensor));
+    } else {
+      // Copy unaligned tensor and using tf allocator
+      Tensor *output_tensor;
+      OP_REQUIRES_OK(context,
+                     context->allocate_output(0, dlpack_allocator->get_shape(),
+                                              &output_tensor));
+      void *tftensor_ptr =
+          const_cast<void *>((const void *)output_tensor->tensor_data().data());
+      void *dlpack_ptr = dlm_tensor->dl_tensor.data;
+      size_t size = dlpack_allocator->get_size();
+      if (dlm_tensor->dl_tensor.ctx.device_type == kDLCPU) {
+        memcpy(tftensor_ptr, dlpack_ptr, size);
+      } else if (dlm_tensor->dl_tensor.ctx.device_type == kDLGPU) {
+        cudaMemcpy(tftensor_ptr, dlpack_ptr, size, cudaMemcpyDeviceToDevice);
+      } else {
+        OP_REQUIRES_OK(context, errors::Internal("Device unsupported"));
+      }
+      dlpack_allocator->DeallocateRaw(nullptr);
+    }
   }
 };
 
 REGISTER_KERNEL_BUILDER(Name("FromDlpack").Device(DEVICE_CPU), FromDLPackOP);
-REGISTER_KERNEL_BUILDER(Name("FromDlpack").Device(DEVICE_GPU).HostMemory("in"), FromDLPackOP);
+REGISTER_KERNEL_BUILDER(Name("FromDlpack").Device(DEVICE_GPU).HostMemory("in"),
+                        FromDLPackOP);

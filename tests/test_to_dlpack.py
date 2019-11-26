@@ -8,6 +8,8 @@ from torch.utils.dlpack import to_dlpack as th_to_dlpack
 import tensorflow as tf
 import torch as th
 
+# tf.config.experimental.set_device_policy("explicit") # This will raise error when type is tf.int32
+
 types = [np.float16, np.float32, np.float32,
          np.int8, np.int16, np.int32, np.int64]
 
