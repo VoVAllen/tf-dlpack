@@ -5,7 +5,7 @@
  */
 #ifdef TFDLPACK_USE_CUDA
 #include <cuda_runtime.h>
-#endif //TFDLPACK_USE_CUDA
+#endif  // TFDLPACK_USE_CUDA
 #include <dlpack/dlpack.h>
 #include <tensorflow/core/framework/allocator.h>
 #include <tensorflow/core/framework/op_kernel.h>
@@ -115,7 +115,7 @@ class FromDLPackOP : public OpKernel {
       } else if (dlm_tensor->dl_tensor.ctx.device_type == kDLGPU) {
 #ifdef TFDLPACK_USE_CUDA
         cudaMemcpy(tftensor_ptr, dlpack_ptr, size, cudaMemcpyDeviceToDevice);
-#endif // TFDLPACK_USE_CUDA
+#endif  // TFDLPACK_USE_CUDA
       } else {
         OP_REQUIRES_OK(context, errors::Internal("Device unsupported"));
       }
