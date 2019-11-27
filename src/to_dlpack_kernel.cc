@@ -1,5 +1,5 @@
 /*!
- *  Copyright (c) 2019 by Contributors
+ * Copyright (c) 2019 by Contributors
  * \file to_dlpack_kernel.cc
  * \brief to dlpack kernel
  */

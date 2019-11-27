@@ -1,5 +1,5 @@
 /*!
- *  Copyright (c) 2019 by Contributors
+ * Copyright (c) 2019 by Contributors
  * \file from_dlpack_kernel.cc
  * \brief from dlpack kernel
  */
@@ -11,15 +11,14 @@
 #include <tensorflow/core/framework/op_kernel.h>
 #include <tensorflow/core/framework/tensor_reference.h>
 #include <cstdio>
-#include "util.h"
+#include "./util.h"
 
 using namespace tensorflow;
-namespace tf = tensorflow;
 
 typedef Eigen::ThreadPoolDevice CPUDevice;
 typedef Eigen::GpuDevice GPUDevice;
 
-inline bool isAligned(size_t alignment, void *data_ptr) {
+inline bool IsAligned(size_t alignment, void *data_ptr) {
   auto iptr = reinterpret_cast<std::uintptr_t>(data_ptr);
   return (iptr % alignment == 0);
 }
@@ -50,7 +49,7 @@ class DLPackAllocator : public Allocator {
           errors::Internal("Invalid number of bytes for DLPack Tensor");
       return nullptr;
     }
-    if (isAligned(alignment, data_)) {
+    if (IsAligned(alignment, data_)) {
       return data_;
     } else {
       allocation_status_ =
@@ -93,9 +92,9 @@ class FromDLPackOP : public OpKernel {
 
     DLPackAllocator *dlpack_allocator = new DLPackAllocator(dlm_tensor);
     // Alignment is always 64 bytes for CPU and GPU in TF
-    if (isAligned(64, dlm_tensor->dl_tensor.data)) {
+    if (IsAligned(64, dlm_tensor->dl_tensor.data)) {
       // Aligned tensor using DLPackAllocator to allocate memory
-      DataType tf_dtype = toTFDataType(dtype);
+      DataType tf_dtype = ToTFDataType(dtype);
       Tensor output_tensor(dlpack_allocator, tf_dtype,
                            dlpack_allocator->get_shape());
       OP_REQUIRES_OK(context, dlpack_allocator->allocation_status());

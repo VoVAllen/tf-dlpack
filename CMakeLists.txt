@@ -46,10 +46,7 @@ endif()
 include_directories(third_party/dlpack/include)
 
 file(GLOB SRC
-  src/dlpack_op.cc
-  src/to_dlpack_kernel.cc
-  src/get_device_and_dtype_kernel.cc
-  src/from_dlpack_kernel.cc
+  src/*.cc
 )
 
 if (NO_CUDA)
