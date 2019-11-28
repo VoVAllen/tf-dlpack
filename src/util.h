@@ -3,8 +3,8 @@
  * \file util.h
  * \brief TF data type utilities
  */
-#ifndef TF_DLPACK_UTIL_H_
-#define TF_DLPACK_UTIL_H_
+#ifndef TFDLPACK_UTIL_H_
+#define TFDLPACK_UTIL_H_
 
 #include <dlpack/dlpack.h>
 #include <tensorflow/core/framework/op_kernel.h>
@@ -16,4 +16,4 @@
  */
 tensorflow::DataType ToTFDataType(const DLDataType &dtype);
 
-#endif  // TF_DLPACK_UTIL_H_
+#endif  // TFDLPACK_UTIL_H_
