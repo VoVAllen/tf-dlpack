@@ -36,16 +36,18 @@ Build
 ```
 mkdir build
 cd build
-cmake ..
+cmake ..  # To build without CUDA, add -DUSE_CUDA=OFF
 make -j4
 ```
 
-so file path is now fixed in `python/tfdlpack/__init__.py`
-Need to change manually
-
-And export the python path to `import tfdlpack`
+Export the library path:
 ```bash
-export PYTHONPATH=/home/ubuntu/dev/tfdlpack/python/:${PYTHONPATH}
+export TF_DLPACK_LIBRARY_PATH=/path/to/tf-dlpack/repo/build
+```
+
+Export python path to `import tfdlpack`
+```bash
+export PYTHONPATH=/path/to/tf-dlpack/repo/python/:${PYTHONPATH}
 ```
 
 ## License

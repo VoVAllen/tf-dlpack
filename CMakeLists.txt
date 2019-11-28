@@ -4,7 +4,8 @@ project(tfdlpack C CXX)
 
 add_definitions(-std=c++11 -fPIC)
 include(cmake/util/FindCUDA.cmake)	
-option(NO_CUDA "Only build TFDLPACK with cpu" OFF)
+
+option(USE_CUDA "Build TF-DLPACK with CUDA support" ON)
 
 if(NOT PYTHON_EXECUTABLE)
   execute_process(
@@ -35,12 +36,15 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 ${TF_CFLAGS}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -D_GLIBCXX_USE_CXX11_ABI=0 ${TF_CFLAGS}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g3 -ggdb -D_GLIBCXX_USE_CXX11_ABI=0 ${TF_CFLAGS}")
 
-if (NOT NO_CUDA)
+if (USE_CUDA)
+  message(STATUS "Build with CUDA.")
   add_definitions(-DTFDLPACK_USE_CUDA)
   find_cuda(ON REQUIRED)
   if(NOT CUDA_FOUND)	
     message(FATAL_ERROR "Cannot find CUDA.")	
   endif()
+else()
+  message(STATUS "Build without CUDA.")
 endif()
 
 include_directories(third_party/dlpack/include)
@@ -49,10 +53,10 @@ file(GLOB SRC
   src/*.cc
 )
 
-if (NO_CUDA)
-  add_library(tfdlpack SHARED ${SRC})
-else()
+if (USE_CUDA)
   cuda_add_library(tfdlpack SHARED ${SRC})
+else()
+  add_library(tfdlpack SHARED ${SRC})
 endif()
 
 target_link_libraries(tfdlpack ${TF_LFLAGS})

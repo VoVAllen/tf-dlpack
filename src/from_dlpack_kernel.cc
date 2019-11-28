@@ -25,16 +25,14 @@ inline bool IsAligned(size_t alignment, void *data_ptr) {
 
 class DLPackAllocator : public Allocator {
  public:
-  static constexpr size_t kAllocatorAlignment = 64;
-
   explicit DLPackAllocator(DLManagedTensor *dlm_tensor) {
     dlm_tensor_ = dlm_tensor;
     data_ = dlm_tensor->dl_tensor.data;
 
     // Shape
     shape_ = TensorShape();
-    int ndim = dlm_tensor->dl_tensor.ndim;
-    int64_t *shape = dlm_tensor->dl_tensor.shape;
+    const int ndim = dlm_tensor->dl_tensor.ndim;
+    const int64_t *shape = dlm_tensor->dl_tensor.shape;
     for (int i = 0; i < ndim; i++) {
       shape_.AddDim(shape[i]);
     }
@@ -61,7 +59,6 @@ class DLPackAllocator : public Allocator {
   void DeallocateRaw(void *ptr) {
     // This would lead to double free, haven't figure out the problem
     dlm_tensor_->deleter(const_cast<DLManagedTensor *>(dlm_tensor_));
-    // std::cout << "Deconstruct dlpack tensor" << std::endl;
     delete this;
   }
 
@@ -78,6 +75,8 @@ class DLPackAllocator : public Allocator {
   int64 num_elements_;
   TensorShape shape_;
   Status allocation_status_;
+
+  TF_DISALLOW_COPY_AND_ASSIGN(DLPackAllocator);
 };
 
 class FromDLPackOP : public OpKernel {

@@ -10,7 +10,6 @@ from .capsule_api import to_capsule, get_capsule_address
 # version number
 __version__ = libinfo.__version__
 
-# print(libinfo.find_lib_path()[0])
 dlpack_ops = load_library.load_op_library(libinfo.find_lib_path()[0])
 _to_dlpack_address = dlpack_ops.to_dlpack
 _from_dlpack = dlpack_ops.from_dlpack

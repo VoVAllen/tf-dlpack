@@ -2,10 +2,10 @@ import tfdlpack
 import torch as th
 from torch.utils.dlpack import from_dlpack, to_dlpack
 from tfdlpack import from_dlpack as tf_from_dlpack
-import gpustat
 import pytest
 
 def get_gpu_memory_used():
+    import gpustat
     gpu_query = gpustat.GPUStatCollection.new_query()
     gmem_used = gpu_query[0].memory_used
     return gmem_used
