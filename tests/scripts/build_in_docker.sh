@@ -6,13 +6,14 @@ BRANCH=$1
 USE_CUDA=$2
 
 pushd /tmp
-git clone https://github.com/VoVAllen/tf-dlpack.git -b $BRANCH
+git clone https://github.com/VoVAllen/tf-dlpack.git --recursive
 pushd tf-dlpack
+git checkout $BRANCH
 
 CONDA_PREFIX=$HOME/miniconda3/bin
 export PATH=$CONDA_PREFIX:$PATH
 export PYTHONPATH=$PWD/python:$PYTHONPATH
-export TF_DLPACK_LIBRARAY_PATH=$PWD/build
+export TF_DLPACK_LIBRARY_PATH=$PWD/build
 for PY_VER in 3.6.4 3.7.0; do
   echo "Build for python $PY_VER"
   source activate $PY_VER
@@ -20,12 +21,17 @@ for PY_VER in 3.6.4 3.7.0; do
   rm -rf build
   mkdir build
   cd build; cmake -DUSE_CUDA=$USE_CUDA ..; make -j; cd ..
+  # test
+  if [ $USE_CUDA = "ON" ]; then
+    python -m pytest tests
+  fi
+  # build wheel
   python setup.py clean
   python setup.py bdist_wheel --plat-name manylinux1_x86_64
   source deactivate
 done
 
-ls -l dist
+cp dist/*.whl /workspace
 
 popd
 popd
