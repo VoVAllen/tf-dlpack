@@ -14,6 +14,7 @@ make -j4
 popd
 
 export TFDLPACK_LIBRARY_PATH=$PWD/build
+export TFDLPACK_PACKAGE_SUFFIX=-gpu
 
 pushd python
 python3 setup.py clean

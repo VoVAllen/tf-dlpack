@@ -85,7 +85,6 @@ if wheel_include_libs:
     with open("MANIFEST.in", "w") as fo:
         for path in LIBS:
             shutil.copy(path, os.path.join(CURRENT_DIR, 'tfdlpack'))
-            print('>>>>>>>>>>>>>', path)
             _, libname = os.path.split(path)
             fo.write("include tfdlpack/%s\n" % libname)
     setup_kwargs = {
@@ -108,7 +107,7 @@ setup(
     author_email='allen.zhou@nyu.edu',
     description='Tensorflow plugin for DLPack',
     packages=find_packages(),
-    install_requires=['tensorflow>=2.0.0'],
+    install_requires=['tensorflow%s>=2.0.0' % os.getenv('TFDLPACK_PACKAGE_SUFFIX')],
     long_description="""
 The package adds interoperability of DLPack to Tensorflow. It contains straightforward
 and easy-to-use APIs to convert Tensorflow tensors from/to DLPack format.
