@@ -1,13 +1,36 @@
 import os
 import re
 import sys
+import shutil
 import platform
 import subprocess
 
 from setuptools import setup, Extension
+from setuptools.dist import Distribution
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
 
+class BinaryDistribution(Distribution):
+    def has_ext_modules(self):
+        return True
+
+CURRENT_DIR = os.path.dirname(__file__)
+
+def get_lib_path():
+    """Get library path, name and version"""
+     # We can not import `libinfo.py` in setup.py directly since __init__.py
+    # Will be invoked which introduces dependences
+    libinfo_py = os.path.join(CURRENT_DIR, './python/tfdlpack/libinfo.py')
+    libinfo = {'__file__': libinfo_py}
+    exec(compile(open(libinfo_py, "rb").read(), libinfo_py, 'exec'), libinfo, libinfo)
+    version = libinfo['__version__']
+
+    lib_path = libinfo['find_lib_path']()
+    libs = [lib_path[0]]
+
+    return libs, version
+
+LIBS, VERSION = get_lib_path()
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
@@ -47,17 +70,57 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', '--build', '.'] +
                               build_args, cwd=self.build_temp)
 
+include_libs = False
+wheel_include_libs = False
+if "bdist_wheel" in sys.argv or os.getenv('CONDA_BUILD'):
+    wheel_include_libs = True
+else:
+    include_libs = True
+
+setup_kwargs = {}
+
+# For bdist_wheel only
+if wheel_include_libs:
+    with open("MANIFEST.in", "w") as fo:
+        for path in LIBS:
+            shutil.copy(path, os.path.join(CURRENT_DIR, 'python', 'tfdlpack'))
+            _, libname = os.path.split(path)
+            fo.write("include tfdlpack/%s\n" % libname)
+    setup_kwargs = {
+        "include_package_data": True
+    }
+
+# For source tree setup
+# Conda build also includes the binary library
+if include_libs:
+    rpath = [os.path.relpath(path, CURRENT_DIR) for path in LIBS]
+    setup_kwargs = {
+        "include_package_data": True,
+        "data_files": [('dgl', rpath)]
+    }
 
 setup(
     name='tfdlpack',
-    version='0.0.1',
+    version=VERSION,
     author='DGL Team',
     author_email='allen.zhou@nyu.edu',
-    description='DLPack for tensorflow',
+    description='Tensorflow plugin for DLPack',
     package_dir={"tfdlpack": "python/tfdlpack/"},
     packages=["tfdlpack"],
-    long_description='',
-    ext_modules=[CMakeExtension('tfdlpack')],
-    cmdclass=dict(build_ext=CMakeBuild),
+    install_requires=['tensorflow>=2.0.0'],
+    long_description="""
+The package adds interoperability of DLPack to Tensorflow. It contains straightforward
+and easy-to-use APIs to convert Tensorflow tensors from/to DLPack format.
+    """,
+    distclass=BinaryDistribution,
     zip_safe=False,
+    license='APACHE',
+    **setup_kwargs
 )
+
+if wheel_include_libs:
+    # Wheel cleanup
+    os.remove("MANIFEST.in")
+    for path in LIBS:
+        _, libname = os.path.split(path)
+        os.remove(os.path.join(CURRENT_DIR, 'python', 'tfdlpack', libname))
