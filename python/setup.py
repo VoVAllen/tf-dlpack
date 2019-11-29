@@ -5,6 +5,7 @@ import shutil
 import platform
 import subprocess
 
+from setuptools import find_packages
 from setuptools import setup, Extension
 from setuptools.dist import Distribution
 from setuptools.command.build_ext import build_ext
@@ -20,7 +21,7 @@ def get_lib_path():
     """Get library path, name and version"""
      # We can not import `libinfo.py` in setup.py directly since __init__.py
     # Will be invoked which introduces dependences
-    libinfo_py = os.path.join(CURRENT_DIR, './python/tfdlpack/libinfo.py')
+    libinfo_py = os.path.join(CURRENT_DIR, 'tfdlpack', 'libinfo.py')
     libinfo = {'__file__': libinfo_py}
     exec(compile(open(libinfo_py, "rb").read(), libinfo_py, 'exec'), libinfo, libinfo)
     version = libinfo['__version__']
@@ -83,7 +84,8 @@ setup_kwargs = {}
 if wheel_include_libs:
     with open("MANIFEST.in", "w") as fo:
         for path in LIBS:
-            shutil.copy(path, os.path.join(CURRENT_DIR, 'python', 'tfdlpack'))
+            shutil.copy(path, os.path.join(CURRENT_DIR, 'tfdlpack'))
+            print('>>>>>>>>>>>>>', path)
             _, libname = os.path.split(path)
             fo.write("include tfdlpack/%s\n" % libname)
     setup_kwargs = {
@@ -96,17 +98,16 @@ if include_libs:
     rpath = [os.path.relpath(path, CURRENT_DIR) for path in LIBS]
     setup_kwargs = {
         "include_package_data": True,
-        "data_files": [('dgl', rpath)]
+        "data_files": [('tfdlpack', rpath)]
     }
 
 setup(
-    name='tfdlpack',
+    name='tfdlpack' + os.getenv('TFDLPACK_PACKAGE_SUFFIX', ''),
     version=VERSION,
-    author='DGL Team',
+    author='Jinjing Zhou',
     author_email='allen.zhou@nyu.edu',
     description='Tensorflow plugin for DLPack',
-    package_dir={"tfdlpack": "python/tfdlpack/"},
-    packages=["tfdlpack"],
+    packages=find_packages(),
     install_requires=['tensorflow>=2.0.0'],
     long_description="""
 The package adds interoperability of DLPack to Tensorflow. It contains straightforward
@@ -123,4 +124,4 @@ if wheel_include_libs:
     os.remove("MANIFEST.in")
     for path in LIBS:
         _, libname = os.path.split(path)
-        os.remove(os.path.join(CURRENT_DIR, 'python', 'tfdlpack', libname))
+        os.remove(os.path.join(CURRENT_DIR, 'tfdlpack', libname))

@@ -24,10 +24,15 @@ for PY_VER in 3.6.4 3.7.0; do
   # test
   if [ $USE_CUDA = "ON" ]; then
     python -m pytest tests
+    export TFDLPACK_PACKAGE_SUFFIX=-gpu
+  else
+    export TFDLPACK_PACKAGE_SUFFIX=
   fi
   # build wheel
+  pushd python
   python setup.py clean
   python setup.py bdist_wheel --plat-name manylinux1_x86_64
+  popd
   source deactivate
 done
 

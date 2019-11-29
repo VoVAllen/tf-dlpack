@@ -30,8 +30,8 @@ def find_lib_path(name=None, search_path=None, optional=False):
 
     dll_path = []
 
-    if os.environ.get('TF_DLPACK_LIBRARY_PATH', None):
-        dll_path.append(os.environ['TF_DLPACK_LIBRARY_PATH'])
+    if os.environ.get('TFDLPACK_LIBRARY_PATH', None):
+        dll_path.append(os.environ['TFDLPACK_LIBRARY_PATH'])
 
     if sys.platform.startswith('linux') and os.environ.get('LD_LIBRARY_PATH', None):
         dll_path.extend([p.strip() for p in os.environ['LD_LIBRARY_PATH'].split(":")])
