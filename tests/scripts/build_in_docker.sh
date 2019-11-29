@@ -13,7 +13,7 @@ git checkout $BRANCH
 CONDA_PREFIX=$HOME/miniconda3/bin
 export PATH=$CONDA_PREFIX:$PATH
 export PYTHONPATH=$PWD/python:$PYTHONPATH
-export TF_DLPACK_LIBRARY_PATH=$PWD/build
+export TFDLPACK_LIBRARY_PATH=$PWD/build
 for PY_VER in 3.6.4 3.7.0; do
   echo "Build for python $PY_VER"
   source activate $PY_VER
@@ -36,7 +36,7 @@ for PY_VER in 3.6.4 3.7.0; do
   source deactivate
 done
 
-cp dist/*.whl /workspace
+cp python/dist/*.whl /workspace
 
 popd
 popd
