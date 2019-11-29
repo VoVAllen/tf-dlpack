@@ -1,5 +1,5 @@
 /*!
- *  Copyright (c) 2019 by Contributors
+ * Copyright (c) 2019 by Contributors
  * \file dlpack_op.cc
  * \brief dlpack op registration
  */

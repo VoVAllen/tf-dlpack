@@ -11,7 +11,7 @@ pipeline {
     stage("Lint Check") {
       agent { 
         docker { 
-          image "dgllib/tfdlpack-test" 
+          image "dgllib/tfdlpack-ci-gpu" 
           args "--runtime nvidia"
         } 
       }
@@ -30,13 +30,13 @@ pipeline {
     stage("Build and Test") {
       agent { 
         docker { 
-          image "dgllib/tfdlpack-test" 
+          image "dgllib/tfdlpack-ci-gpu" 
           args "--runtime nvidia"
         } 
       }
       steps {
         init_git()
-        sh "python -m pip install ."
+        sh "bash tests/scripts/task_build.sh"
         sh "python -m pytest tests"
       }
       post {
@@ -45,6 +45,5 @@ pipeline {
         }
       }
     }
-
   }
 }

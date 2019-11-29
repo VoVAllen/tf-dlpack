@@ -1,5 +1,5 @@
 /*!
- *  Copyright (c) 2019 by Contributors
+ * Copyright (c) 2019 by Contributors
  * \file from_dlpack_kernel.cc
  * \brief from dlpack kernel
  */
@@ -11,31 +11,28 @@
 #include <tensorflow/core/framework/op_kernel.h>
 #include <tensorflow/core/framework/tensor_reference.h>
 #include <cstdio>
-#include "util.h"
+#include "./util.h"
 
 using namespace tensorflow;
-namespace tf = tensorflow;
 
 typedef Eigen::ThreadPoolDevice CPUDevice;
 typedef Eigen::GpuDevice GPUDevice;
 
-inline bool isAligned(size_t alignment, void *data_ptr) {
+inline bool IsAligned(size_t alignment, void *data_ptr) {
   auto iptr = reinterpret_cast<std::uintptr_t>(data_ptr);
   return (iptr % alignment == 0);
 }
 
 class DLPackAllocator : public Allocator {
  public:
-  static constexpr size_t kAllocatorAlignment = 64;
-
   explicit DLPackAllocator(DLManagedTensor *dlm_tensor) {
     dlm_tensor_ = dlm_tensor;
     data_ = dlm_tensor->dl_tensor.data;
 
     // Shape
     shape_ = TensorShape();
-    int ndim = dlm_tensor->dl_tensor.ndim;
-    int64_t *shape = dlm_tensor->dl_tensor.shape;
+    const int ndim = dlm_tensor->dl_tensor.ndim;
+    const int64_t *shape = dlm_tensor->dl_tensor.shape;
     for (int i = 0; i < ndim; i++) {
       shape_.AddDim(shape[i]);
     }
@@ -50,7 +47,7 @@ class DLPackAllocator : public Allocator {
           errors::Internal("Invalid number of bytes for DLPack Tensor");
       return nullptr;
     }
-    if (isAligned(alignment, data_)) {
+    if (IsAligned(alignment, data_)) {
       return data_;
     } else {
       allocation_status_ =
@@ -62,7 +59,6 @@ class DLPackAllocator : public Allocator {
   void DeallocateRaw(void *ptr) {
     // This would lead to double free, haven't figure out the problem
     dlm_tensor_->deleter(const_cast<DLManagedTensor *>(dlm_tensor_));
-    // std::cout << "Deconstruct dlpack tensor" << std::endl;
     delete this;
   }
 
@@ -79,6 +75,8 @@ class DLPackAllocator : public Allocator {
   int64 num_elements_;
   TensorShape shape_;
   Status allocation_status_;
+
+  TF_DISALLOW_COPY_AND_ASSIGN(DLPackAllocator);
 };
 
 class FromDLPackOP : public OpKernel {
@@ -93,9 +91,9 @@ class FromDLPackOP : public OpKernel {
 
     DLPackAllocator *dlpack_allocator = new DLPackAllocator(dlm_tensor);
     // Alignment is always 64 bytes for CPU and GPU in TF
-    if (isAligned(64, dlm_tensor->dl_tensor.data)) {
+    if (IsAligned(64, dlm_tensor->dl_tensor.data)) {
       // Aligned tensor using DLPackAllocator to allocate memory
-      DataType tf_dtype = toTFDataType(dtype);
+      DataType tf_dtype = ToTFDataType(dtype);
       Tensor output_tensor(dlpack_allocator, tf_dtype,
                            dlpack_allocator->get_shape());
       OP_REQUIRES_OK(context, dlpack_allocator->allocation_status());

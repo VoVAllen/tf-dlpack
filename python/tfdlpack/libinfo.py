@@ -19,19 +19,17 @@ def find_lib_path(name=None, search_path=None, optional=False):
     """
     # See https://github.com/dmlc/tvm/issues/281 for some background.
 
-    # NB: This will either be the source directory (if DGL is run
-    # inplace) or the install directory (if DGL is installed).
-    # An installed DGL's curr_path will look something like:
-    #   $PREFIX/lib/python3.6/site-packages/tfdlpack/_ffi
+    # NB: This will either be the source directory (if tfdlpack is run
+    # inplace) or the install directory (if tfdlpack is installed).
+    # An installed tfdlpack's curr_path will look something like:
+    #   $PREFIX/lib/python3.6/site-packages/tfdlpack
     source_dir = os.path.dirname(os.path.abspath(os.path.expanduser(__file__)))
     install_lib_dir = os.path.join(source_dir, "build")
-    # source_dir = os.path.join(ffi_dir, "..", "..")
-    # install_lib_dir = os.path.join(ffi_dir, "..", "..", "..")
 
     dll_path = []
 
-    if os.environ.get('TF_DLPACK_LIBRARY_PATH', None):
-        dll_path.append(os.environ['TF_DLPACK_LIBRARY_PATH'])
+    if os.environ.get('TFDLPACK_LIBRARY_PATH', None):
+        dll_path.append(os.environ['TFDLPACK_LIBRARY_PATH'])
 
     if sys.platform.startswith('linux') and os.environ.get('LD_LIBRARY_PATH', None):
         dll_path.extend([p.strip() for p in os.environ['LD_LIBRARY_PATH'].split(":")])
@@ -39,7 +37,7 @@ def find_lib_path(name=None, search_path=None, optional=False):
         dll_path.extend([p.strip() for p in os.environ['DYLD_LIBRARY_PATH'].split(":")])
 
     # Pip lib directory
-    # dll_path.append(os.path.join(ffi_dir, ".."))
+    dll_path.append(source_dir)
     # Default cmake build directory
     dll_path.append(os.path.join(source_dir, "build"))
     dll_path.append(os.path.join(source_dir, "build", "Release"))
