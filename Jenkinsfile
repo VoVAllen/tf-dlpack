@@ -11,7 +11,7 @@ pipeline {
     stage("Lint Check") {
       agent { 
         docker { 
-          image "dgllib/tfdlpack-test" 
+          image "dgllib/tfdlpack-ci-gpu" 
           args "--runtime nvidia"
         } 
       }
@@ -30,7 +30,7 @@ pipeline {
     stage("Build and Test") {
       agent { 
         docker { 
-          image "dgllib/tfdlpack-test" 
+          image "dgllib/tfdlpack-ci-gpu" 
           args "--runtime nvidia"
         } 
       }
