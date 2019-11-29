@@ -36,7 +36,7 @@ pipeline {
       }
       steps {
         init_git()
-        sh "python -m pip install ."
+        sh "bash tests/scripts/task_build.sh"
         sh "python -m pytest tests"
       }
       post {
