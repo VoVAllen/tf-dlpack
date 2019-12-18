@@ -14,12 +14,13 @@ sh /tmp/install.sh -b
 
 CONDA_PREFIX=$HOME/miniconda3/bin
 export PATH=$CONDA_PREFIX:$PATH
-for PY_VER in 3.6.4 3.7.0; do
+for PY_VER in 3.5 3.6 3.7; do
   echo "Create conda env for python $PY_VER"
   conda create -n $PY_VER -y python=$PY_VER
   source activate $PY_VER
-  conda install -y $TF==2.0 pytest
-  echo conda install -y $TH -c pytorch
+  pip install --upgrade pip
+  pip install $TF==2.0
+  conda install -y pytest
   conda install -y $TH -c pytorch
   source deactivate
 done
