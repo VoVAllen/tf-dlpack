@@ -14,7 +14,7 @@ CONDA_PREFIX=$HOME/miniconda3/bin
 export PATH=$CONDA_PREFIX:$PATH
 export PYTHONPATH=$PWD/python:$PYTHONPATH
 export TFDLPACK_LIBRARY_PATH=$PWD/build
-for PY_VER in 3.6.4 3.7.0; do
+for PY_VER in 3.5 3.6 3.7; do
   echo "Build for python $PY_VER"
   source activate $PY_VER
   # clean & build
