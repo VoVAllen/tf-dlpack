@@ -33,43 +33,43 @@ def get_lib_path():
 
 LIBS, VERSION = get_lib_path()
 
-class CMakeExtension(Extension):
-    def __init__(self, name, sourcedir=''):
-        Extension.__init__(self, name, sources=[])
-        self.sourcedir = os.path.abspath(sourcedir)
+# class CMakeExtension(Extension):
+#     def __init__(self, name, sourcedir=''):
+#         Extension.__init__(self, name, sources=[])
+#         self.sourcedir = os.path.abspath(sourcedir)
 
 
-class CMakeBuild(build_ext):
-    def run(self):
-        try:
-            out = subprocess.check_output(['cmake', '--version'])
-        except OSError:
-            raise RuntimeError("CMake must be installed to build the following extensions: " +
-                               ", ".join(e.name for e in self.extensions))
+# class CMakeBuild(build_ext):
+#     def run(self):
+#         try:
+#             out = subprocess.check_output(['cmake', '--version'])
+#         except OSError:
+#             raise RuntimeError("CMake must be installed to build the following extensions: " +
+#                                ", ".join(e.name for e in self.extensions))
 
-        if platform.system() == "Windows":
-            raise RuntimeError("Windows is not currently supported")
+#         if platform.system() == "Windows":
+#             raise RuntimeError("Windows is not currently supported")
 
-        for ext in self.extensions:
-            self.build_extension(ext)
+#         for ext in self.extensions:
+#             self.build_extension(ext)
 
-    def build_extension(self, ext):
-        extdir = os.path.abspath(os.path.dirname(
-            self.get_ext_fullpath(ext.name)))
-        extdir = os.path.join(extdir, "tfdlpack", "build") # Not sure whether this is fine
+#     def build_extension(self, ext):
+#         extdir = os.path.abspath(os.path.dirname(
+#             self.get_ext_fullpath(ext.name)))
+#         extdir = os.path.join(extdir, "tfdlpack", "build") # Not sure whether this is fine
 
-        cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
-                      '-DPYTHON_EXECUTABLE=' + sys.executable]
+#         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
+#                       '-DPYTHON_EXECUTABLE=' + sys.executable]
 
-        cfg = 'Debug' if self.debug else 'Release'
-        build_args = ['--config', cfg]
-        env = os.environ.copy()
-        if not os.path.exists(self.build_temp):
-            os.makedirs(self.build_temp)
-        subprocess.check_call(['cmake', ext.sourcedir] +
-                              cmake_args, cwd=self.build_temp, env=env)
-        subprocess.check_call(['cmake', '--build', '.'] +
-                              build_args, cwd=self.build_temp)
+#         cfg = 'Debug' if self.debug else 'Release'
+#         build_args = ['--config', cfg]
+#         env = os.environ.copy()
+#         if not os.path.exists(self.build_temp):
+#             os.makedirs(self.build_temp)
+#         subprocess.check_call(['cmake', ext.sourcedir] +
+#                               cmake_args, cwd=self.build_temp, env=env)
+#         subprocess.check_call(['cmake', '--build', '.'] +
+#                               build_args, cwd=self.build_temp)
 
 include_libs = False
 wheel_include_libs = False
