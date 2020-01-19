@@ -40,6 +40,7 @@ if (USE_CUDA)
   message(STATUS "Build with CUDA.")
   add_definitions(-DTFDLPACK_USE_CUDA)
   find_cuda(ON REQUIRED)
+  include_directories(${CUDA_INCLUDE_DIRS})
   if(NOT CUDA_FOUND)	
     message(FATAL_ERROR "Cannot find CUDA.")	
   endif()
@@ -53,11 +54,7 @@ file(GLOB SRC
   src/*.cc
 )
 
-if (USE_CUDA)
-  cuda_add_library(tfdlpack SHARED ${SRC})
-else()
-  add_library(tfdlpack SHARED ${SRC})
-endif()
+add_library(tfdlpack SHARED ${SRC})
 
 target_link_libraries(tfdlpack ${TF_LFLAGS})
 

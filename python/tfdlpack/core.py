@@ -14,6 +14,11 @@ dlpack_ops = load_library.load_op_library(libinfo.find_lib_path()[0])
 _to_dlpack_address = dlpack_ops.to_dlpack
 _from_dlpack = dlpack_ops.from_dlpack
 _get_device_and_dtype = dlpack_ops.get_device_and_dtype
+_destruct_dlpack = dlpack_ops.destruct_dlpack
+
+def _destruct_capsule(dlm_address):
+    with tf.device("cpu"):
+        _destruct_dlpack(dlm_address)
 
 
 def to_dlpack(tf_tensor):
