@@ -48,7 +48,7 @@ class CMakeBuild(build_ext):
                                ", ".join(e.name for e in self.extensions))
 
         if platform.system() == "Windows":
-            raise RuntimeError("Windows not currently supported")
+            raise RuntimeError("Windows is not currently supported")
 
         for ext in self.extensions:
             self.build_extension(ext)
@@ -107,7 +107,6 @@ setup(
     author_email='allen.zhou@nyu.edu',
     description='Tensorflow plugin for DLPack',
     packages=find_packages(),
-    install_requires=['tensorflow%s>=2.0.0' % os.getenv('TFDLPACK_PACKAGE_SUFFIX')],
     long_description="""
 The package adds interoperability of DLPack to Tensorflow. It contains straightforward
 and easy-to-use APIs to convert Tensorflow tensors from/to DLPack format.

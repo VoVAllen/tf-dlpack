@@ -13,17 +13,28 @@ def c_str(string):
     return ctypes.c_char_p(string.encode('utf-8'))
 
 
+DLPackPyCapsuleDestructor = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
+
+def _dlpack_deleter(pycapsule):
+    from .core import _destruct_capsule
+    pycapsule = ctypes.cast(pycapsule, ctypes.py_object)
+    if ctypes.pythonapi.PyCapsule_IsValid(pycapsule, _c_str_dltensor):
+        ptr = ctypes.pythonapi.PyCapsule_GetPointer(pycapsule, _c_str_dltensor)
+        _destruct_capsule(ptr)
+        ctypes.pythonapi.PyCapsule_SetDestructor(pycapsule, DLPackPyCapsuleDestructor(0))
+
+_c_dlpack_deleter = DLPackPyCapsuleDestructor(_dlpack_deleter)
+
 _c_str_dltensor = c_str('dltensor')
 _c_str_used_dltensor = c_str('used_dltensor')
 
-DLPackPyCapsuleDestructor = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
 
 
 def to_capsule(ad_tensor):
     """convert address tensor to capsule"""
     add = int(ad_tensor.numpy())
     ptr = ctypes.c_void_p(add)
-    capsule = ctypes.pythonapi.PyCapsule_New(ptr, _c_str_dltensor, DLPackPyCapsuleDestructor(0))
+    capsule = ctypes.pythonapi.PyCapsule_New(ptr, _c_str_dltensor, _c_dlpack_deleter)
     return capsule
 
 

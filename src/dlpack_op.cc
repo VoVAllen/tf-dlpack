@@ -25,3 +25,7 @@ REGISTER_OP("FromDlpack")
 REGISTER_OP("GetDeviceAndDtype")
   .Input("in : uint64")
   .Output("out : int32");
+
+// Call destructor of DLManagedTensor
+REGISTER_OP("DestructDLPACK")
+  .Input("in : uint64");
