@@ -29,6 +29,9 @@ export TF_FORCE_GPU_ALLOW_GROWTH=true
 
 ### [CuPy](https://github.com/cupy/cupy) <-> TensorFlow
 ```python
+# pip install cupy>=6.2.0
+import cupy as cp
+
 # CuPy - GPU Array (like NumPy!)
 gpu_arr = cp.random.rand(10_000, 10_000)
 
@@ -48,6 +51,10 @@ cupy_arr = cp.fromDlpack(dlpack_capsule)
 
 ### [Numba](https://github.com/numba/numba) CUDA <-> TensorFlow
 ```python
+# pip install numba numpy
+import numpy as np
+from numba import cuda
+
 # NumPy - CPU Array
 cpu_arr = np.random.rand(10_000, 10_000)
 
@@ -70,6 +77,7 @@ numba_arr = cuda.to_device(cp.fromDlpack(dlpack_capsule))
 
 ### PyTorch <-> TensorFlow
 ```python
+# pip install torch
 import torch
 import tfdlpack
 from torch.utils import dlpack as th_dlpack
