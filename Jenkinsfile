@@ -9,11 +9,11 @@ pipeline {
   agent any
   stages {
     stage("Lint Check") {
-      agent { 
-        docker { 
-          image "dgllib/tfdlpack-ci-gpu" 
+      agent {
+        docker {
+          image "dgllib/tfdlpack-ci-gpu:03302020"
           args "--runtime nvidia"
-        } 
+        }
       }
       steps {
         init_git()
@@ -28,11 +28,11 @@ pipeline {
     }
 
     stage("Build and Test") {
-      agent { 
-        docker { 
-          image "dgllib/tfdlpack-ci-gpu" 
+      agent {
+        docker {
+          image "dgllib/tfdlpack-ci-gpu:03302020"
           args "--runtime nvidia"
-        } 
+        }
       }
       steps {
         init_git()
