@@ -21,9 +21,10 @@ for PY_VER in 3.5 3.6 3.7; do
   rm -rf build
   mkdir build
   for TF_VER in "2.1.0" "2.2.0rc2"; do
-    pip uninstall tensorflow
+    pip uninstall -y tensorflow numpy
     pip install tensorflow==$TF_VER
     cd build; cmake -DUSE_CUDA=$USE_CUDA ..; make -j; cd ..
+  done
   # test
   if [ $USE_CUDA = "ON" ]; then
     python -m pytest tests

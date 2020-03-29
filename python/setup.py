@@ -25,12 +25,10 @@ def get_lib_path():
     libinfo = {'__file__': libinfo_py}
     exec(compile(open(libinfo_py, "rb").read(), libinfo_py, 'exec'), libinfo, libinfo)
     version = libinfo['__version__']
-    tf_version_map = libinfo['__tf_version_map__']
-    tf_versions = list(set(tf_version_map.values()))
-    libname = ['libtfdlpack-tf-{}.so'.format(tfv) for tfv in tf_versions]
-
-    lib_path = libinfo['find_lib_path'](libname)
-    libs = [lib_path[0]]
+    libs = []
+    for libname in libinfo['libnames']:
+        lib_path = libinfo['find_lib_path'](libname)
+        libs.append(lib_path[0])
 
     return libs, version
 

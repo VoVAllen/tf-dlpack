@@ -81,6 +81,8 @@ def find_lib_path(name=None, search_path=None, optional=False):
     return lib_found
 
 # supported tensorflow versions (map from tf version to lib name)
+libnames = ["libtfdlpack-tf-2.1.0.so", "libtfdlpack-tf-2.2.0.so"]
+
 from distutils.version import StrictVersion
 import re
 version_re = re.compile(r'(?x)^((\d+)\.(\d+)\.(\d+))')
