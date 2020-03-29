@@ -101,4 +101,4 @@ def get_libname(tfversion):
 # We use the version of the incoming release for code
 # that is under development.
 # The following line is set by tfdlpack/python/update_version.py
-__version__ = "0.1.2"
+__version__ = "0.1.3"
