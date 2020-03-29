@@ -13,17 +13,24 @@ git checkout $BRANCH
 CONDA_PREFIX=$HOME/miniconda3/bin
 export PATH=$CONDA_PREFIX:$PATH
 export PYTHONPATH=$PWD/python:$PYTHONPATH
-export TFDLPACK_LIBRARY_PATH=$PWD/build
+export TFDLPACK_LIBRARY_PATH=$PWD/libs
 for PY_VER in 3.5 3.6 3.7; do
   echo "Build for python $PY_VER"
   source activate $PY_VER
   # clean & build
-  rm -rf build
-  mkdir build
+  rm -rf libs
+  mkdir libs
   for TF_VER in "2.1.0" "2.2.0rc2"; do
-    pip uninstall -y tensorflow numpy
-    pip install tensorflow==$TF_VER
+    pip uninstall -y tensorflow
+    if [ $PY_VER = "3.5" ]; then
+      pip uninstall -y numpy
+      pip install numpy
+    fi
+    pip install $HOME/$PY_VER/tensorflow*${TF_VER}*.whl
+    rm -rf build
+    mkdir build
     cd build; cmake -DUSE_CUDA=$USE_CUDA ..; make -j; cd ..
+    mv build/*.so libs
   done
   # test
   if [ $USE_CUDA = "ON" ]; then
