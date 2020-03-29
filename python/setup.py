@@ -25,51 +25,16 @@ def get_lib_path():
     libinfo = {'__file__': libinfo_py}
     exec(compile(open(libinfo_py, "rb").read(), libinfo_py, 'exec'), libinfo, libinfo)
     version = libinfo['__version__']
+    tf_version_map = libinfo['__tf_version_map__']
+    tf_versions = list(set(tf_version_map.values()))
+    libname = ['libtfdlpack-tf-{}.so'.format(tfv) for tfv in tf_versions]
 
-    lib_path = libinfo['find_lib_path']()
+    lib_path = libinfo['find_lib_path'](libname)
     libs = [lib_path[0]]
 
     return libs, version
 
 LIBS, VERSION = get_lib_path()
-
-# class CMakeExtension(Extension):
-#     def __init__(self, name, sourcedir=''):
-#         Extension.__init__(self, name, sources=[])
-#         self.sourcedir = os.path.abspath(sourcedir)
-
-
-# class CMakeBuild(build_ext):
-#     def run(self):
-#         try:
-#             out = subprocess.check_output(['cmake', '--version'])
-#         except OSError:
-#             raise RuntimeError("CMake must be installed to build the following extensions: " +
-#                                ", ".join(e.name for e in self.extensions))
-
-#         if platform.system() == "Windows":
-#             raise RuntimeError("Windows is not currently supported")
-
-#         for ext in self.extensions:
-#             self.build_extension(ext)
-
-#     def build_extension(self, ext):
-#         extdir = os.path.abspath(os.path.dirname(
-#             self.get_ext_fullpath(ext.name)))
-#         extdir = os.path.join(extdir, "tfdlpack", "build") # Not sure whether this is fine
-
-#         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
-#                       '-DPYTHON_EXECUTABLE=' + sys.executable]
-
-#         cfg = 'Debug' if self.debug else 'Release'
-#         build_args = ['--config', cfg]
-#         env = os.environ.copy()
-#         if not os.path.exists(self.build_temp):
-#             os.makedirs(self.build_temp)
-#         subprocess.check_call(['cmake', ext.sourcedir] +
-#                               cmake_args, cwd=self.build_temp, env=env)
-#         subprocess.check_call(['cmake', '--build', '.'] +
-#                               build_args, cwd=self.build_temp)
 
 include_libs = False
 wheel_include_libs = False
