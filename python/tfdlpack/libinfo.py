@@ -2,7 +2,8 @@
 from __future__ import absolute_import
 import sys
 import os
-
+from distutils.version import StrictVersion
+import re
 
 def find_lib_path(name=None, search_path=None, optional=False):
     """Find dynamic library files.
@@ -81,9 +82,25 @@ def find_lib_path(name=None, search_path=None, optional=False):
 
     return lib_found
 
+# supported tensorflow versions (map from tf version to lib name)
+LIBNAMES = ["libtfdlpack-tf-2.1.0.so", "libtfdlpack-tf-2.2.0.so"]
+
+def get_libname(tfversion):
+    """Get tfdlpack library name given the tensorflow version"""
+    version_re = re.compile(r'(?x)^((\d+)\.(\d+)\.(\d+))')
+    match = version_re.match(tfversion)
+    if match is None:
+        raise RuntimeError("Unsupported tensorflow version:", tfversion)
+    strict_ver = StrictVersion(match.groups()[0])
+    if strict_ver <= StrictVersion('2.1.0'):
+        return "libtfdlpack-tf-2.1.0.so"
+    elif strict_ver <= StrictVersion('2.2.0'):
+        return "libtfdlpack-tf-2.2.0.so"
+    else:
+        raise RuntimeError("Unsupported tensorflow version:", tfversion)
 
 # current version
 # We use the version of the incoming release for code
 # that is under development.
 # The following line is set by tfdlpack/python/update_version.py
-__version__ = "0.1.2"
+__version__ = "0.1.3"

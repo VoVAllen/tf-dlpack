@@ -32,6 +32,13 @@ execute_process(
 )
 message(STATUS "TF_LFLAGS = ${TF_LFLAGS}")
 
+execute_process(
+  COMMAND bash -c "${PYTHON_EXECUTABLE} -c 'import tensorflow as tf; print(tf.__version__)' | grep -o '[[:digit:]]\\+\\.[[:digit:]]\\+\\.[[:digit:]]\\+'"
+  OUTPUT_VARIABLE TF_VERSION
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+message(STATUS "TF_VERSION = ${TF_VERSION}")
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 ${TF_CFLAGS}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -D_GLIBCXX_USE_CXX11_ABI=0 ${TF_CFLAGS}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g3 -ggdb -D_GLIBCXX_USE_CXX11_ABI=0 ${TF_CFLAGS}")
@@ -54,8 +61,10 @@ file(GLOB SRC
   src/*.cc
 )
 
-add_library(tfdlpack SHARED ${SRC})
+set(LIB_NAME "tfdlpack-tf-${TF_VERSION}")
 
-target_link_libraries(tfdlpack ${TF_LFLAGS})
+add_library(${LIB_NAME} SHARED ${SRC})
 
-install(TARGETS tfdlpack DESTINATION tfdlpack)
+target_link_libraries(${LIB_NAME} ${TF_LFLAGS})
+
+install(TARGETS ${LIB_NAME} DESTINATION tfdlpack)

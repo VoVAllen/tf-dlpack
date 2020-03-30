@@ -1,4 +1,4 @@
-# pylint: disable=no-name-in-module, invalid-name
+# pylint: disable=no-name-in-module, invalid-name, no-member
 """core functions"""
 
 import tensorflow as tf
@@ -10,7 +10,9 @@ from .capsule_api import to_capsule, get_capsule_address
 # version number
 __version__ = libinfo.__version__
 
-dlpack_ops = load_library.load_op_library(libinfo.find_lib_path()[0])
+# find lib
+libname = libinfo.get_libname(tf.__version__)
+dlpack_ops = load_library.load_op_library(libinfo.find_lib_path(libname)[0])
 _to_dlpack_address = dlpack_ops.to_dlpack
 _from_dlpack = dlpack_ops.from_dlpack
 _get_device_and_dtype = dlpack_ops.get_device_and_dtype
@@ -45,9 +47,7 @@ def from_dlpack(dl_capsule):
     device_and_dtype = get_device_and_dtype(dl_capsule)
     device = device_and_dtype[:2]
     dtype = device_and_dtype[2]
-    # print("Dtype: {}".format(dtype))
     ptr = get_capsule_address(dl_capsule, consume=True)
-    # tf_device_type =
     if device[0] == 1:
         tf_device_type = "cpu"
         tf_device_id = int(device[1])
@@ -60,7 +60,6 @@ def from_dlpack(dl_capsule):
     with tf.device("cpu:0"):
         ad_tensor = tf.constant([ptr], dtype=tf.uint64)
     with tf.device(tf_device):
-        # tf_tensor = _from_dlpack(ad_tensor, T=tf.float32)
         tf_tensor = _from_dlpack(ad_tensor, T=tf.DType(dtype))
 
     return tf_tensor
