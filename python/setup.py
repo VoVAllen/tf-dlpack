@@ -26,7 +26,7 @@ def get_lib_path():
     exec(compile(open(libinfo_py, "rb").read(), libinfo_py, 'exec'), libinfo, libinfo)
     version = libinfo['__version__']
     libs = []
-    for libname in libinfo['libnames']:
+    for libname in libinfo['LIBNAMES']:
         lib_path = libinfo['find_lib_path'](libname)
         libs.append(lib_path[0])
 

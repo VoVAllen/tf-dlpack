@@ -1,4 +1,4 @@
-# pylint: disable=no-name-in-module, invalid-name
+# pylint: disable=no-name-in-module, invalid-name, no-member
 """core functions"""
 
 import tensorflow as tf
