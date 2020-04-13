@@ -1,6 +1,8 @@
 # DLPack for Tensorflow
 [![Build Status](http://ci.dgl.ai:80/buildStatus/icon?job=tf-dlpack/master)](http://ci.dgl.ai:80/job/tf-dlpack/job/master/) 
 
+DLPack is now officially supported in the latest tensorflow nightly build(`tf-nightly`), by `tf.experimental.dlpack.to_dlpack/from_dlpack`. 
+
 Notes: Currently only tested under tensorflow 2.0's eager mode. Implementation details could be found [here](https://github.com/VoVAllen/tf-dlpack/issues/3).
 
 ## Install
